@@ -13,9 +13,17 @@ while loop:
         lower, upper = get_limits(target_color)
         mask = cv2.inRange(hsvImage, lower, upper)
 
-        cv2.imshow("Webcam", mask)
+        contours, _ = cv2.findContours(
+            mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    if cv2.waitKey(30) == ord('q'):
+        for contour in contours:
+            if cv2.contourArea(contour) > 50:
+                rect = cv2.boundingRect(contour)
+                cv2.rectangle(frame, rect, color=(255, 255, 0), thickness=2)
+
+        cv2.imshow("Webcam", frame[:, ::-1, :])
+
+    if cv2.waitKey(20) == ord('q'):
         loop = False
 
 webcam.release()

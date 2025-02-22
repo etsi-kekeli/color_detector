@@ -1,8 +1,22 @@
+#!/home/yao/anaconda3/envs/Calibration/bin/python
+
 import cv2
-from utils import get_limits
+import argparse
+import sys
+from utils import get_limits, get_color_representation
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--color", default='yellow')
+
+args = parser.parse_args()
+target_color = get_color_representation(args.color)
+print(target_color)
+
+if target_color is None:
+    print("Unsupported color specified. Update the supported colors list.")
+    sys.exit(1)
 
 webcam = cv2.VideoCapture(0)
-target_color = (0, 255, 255)  # Jaune dans l'espace BGR
 loop = True
 
 while loop:
@@ -10,7 +24,7 @@ while loop:
 
     if ret:
         hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        lower, upper = get_limits(target_color)
+        lower, upper = get_limits(target_color, tol=20)
         mask = cv2.inRange(hsvImage, lower, upper)
 
         contours, _ = cv2.findContours(
